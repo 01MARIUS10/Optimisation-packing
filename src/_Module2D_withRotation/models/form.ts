@@ -1,6 +1,7 @@
 
-import type { Position, Polygone } from '../types'
+import type { Position, Polygone,Degre } from '../types'
 import { getRandomColor } from '../../helpers/color'
+
 
 // Le polygone représente la liste ordonnée des points reliés en trait
 
@@ -17,4 +18,5 @@ export abstract class Form {
     // Chaque forme doit définir la zone qu'elle occupe
     //c'est comme une
     public abstract getEspaceOccupe(): Polygone;
+    public abstract rotate(degre: Degre): void
 }

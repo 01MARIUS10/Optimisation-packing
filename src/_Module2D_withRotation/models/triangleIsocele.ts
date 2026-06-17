@@ -1,14 +1,32 @@
-import type { Position,Polygone } from '../types'
+import type { Position, Polygone, Degre } from '../types'
 import { Form } from './form'
 
 // 3. Classe TriangleIsocèle
 export class TriangleIsocele extends Form {
+    // Dimensions telles que construites, indépendantes de la rotation courante
+    private readonly baseOriginale: number
+    private readonly hauteurOriginale: number
+
     constructor(
         position: Position, // Milieu de la base du triangle
         public base: number,
         public hauteur: number
     ) {
         super(position);
+        this.baseOriginale = base
+        this.hauteurOriginale = hauteur
+    }
+
+    // Rotation absolue (pas cumulative) : 90° échange base/hauteur (l'empreinte
+    // largeur×hauteur s'inverse), 0° et 180° restaurent les dimensions d'origine
+    public rotate(degre: Degre): void {
+        if (degre === 90) {
+            this.base = this.hauteurOriginale
+            this.hauteur = this.baseOriginale
+        } else {
+            this.base = this.baseOriginale
+            this.hauteur = this.hauteurOriginale
+        }
     }
 
     public getEspaceOccupe(): Polygone {

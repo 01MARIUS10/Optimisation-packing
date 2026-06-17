@@ -4,7 +4,7 @@ import { useWindow } from './window'
 import { nfdh } from '../algorithme/NFDH'
 import { ffdh } from '../algorithme/FFDH'
 import { bf } from '../algorithme/BF'
-import { boundingBox } from '../algorithme/geometrie'
+import { Geometrie } from '../algorithme/geometrie'
 import type { Form } from '../models/form'
 import type { Strategy } from '../types'
 
@@ -34,8 +34,8 @@ function applyResult(result: Conteneur): void {
 function validFormes(formes: Form[]): Form[] {
   error.value = null
   const valid = formes.filter(f => {
-    const box = boundingBox(f.getEspaceOccupe())
-    return box.w <= windowWidth.value && box.h <= windowHeight.value
+    const e = Geometrie.etendue(f)
+    return e.w <= windowWidth.value && e.h <= windowHeight.value
   })
   if (valid.length < formes.length) {
     error.value = `Certaines formes sont trop grandes pour le conteneur`

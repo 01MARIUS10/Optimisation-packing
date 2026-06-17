@@ -3,7 +3,7 @@ import type { Form } from '../models/form'
 import { Rectangle } from '../models/rectangle'
 import { Cercle } from '../models/cercle'
 import { TriangleIsocele } from '../models/triangleIsocele'
-import { boundingBox } from '../algorithme/geometrie'
+import { Geometrie } from '../algorithme/geometrie'
 import RectangleView from './Rectangle.vue'
 import CercleView from './Cercle.vue'
 import TriangleView from './Triangle.vue'
@@ -11,7 +11,7 @@ import TriangleView from './Triangle.vue'
 defineProps<{ titre: string; objectList: Form[] }>()
 
 function previewBox(forme: Form) {
-  return boundingBox(forme.getEspaceOccupe())
+  return Geometrie.etendue(forme)
 }
 </script>
 

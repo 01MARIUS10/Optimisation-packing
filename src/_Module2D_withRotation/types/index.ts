@@ -5,3 +5,5 @@ export interface Position {
   y: number
 }
 export type Polygone = Position[];
+
+export type Degre = 0 | 90 | 180 ;

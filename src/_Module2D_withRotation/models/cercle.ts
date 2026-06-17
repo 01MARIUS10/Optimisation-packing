@@ -1,4 +1,4 @@
-import type { Position, Polygone } from '../types'
+import type { Position, Polygone, Degre } from '../types'
 import { Form } from './form'
 
 export class Cercle extends Form {
@@ -7,6 +7,11 @@ export class Cercle extends Form {
         public rayon: number
     ) {
         super(position);
+    }
+
+    // Un cercle est invariant par rotation : son empreinte ne change jamais
+    public rotate(_degre: Degre): void {
+        // rien à faire
     }
 
     public getEspaceOccupe(): Polygone {

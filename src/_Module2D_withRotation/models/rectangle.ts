@@ -1,14 +1,32 @@
 import { Form } from './form'
-import type { Position, Polygone } from '../types'
+import type { Position, Polygone, Degre } from '../types'
 
 // 2. Classe Rectangle
 export class Rectangle extends Form {
+    // Dimensions telles que construites, indépendantes de la rotation courante
+    private readonly largeurOriginale: number
+    private readonly hauteurOriginale: number
+
     constructor(
         position: Position, // Coin inférieur gauche du rectangle
         public largeur: number,
         public hauteur: number
     ) {
         super(position);
+        this.largeurOriginale = largeur
+        this.hauteurOriginale = hauteur
+    }
+
+    // Rotation absolue (pas cumulative) : 90° échange largeur/hauteur,
+    // 0° et 180° donnent la même empreinte pour un rectangle axé sur les axes
+    public rotate(degre: Degre): void {
+        if (degre === 90) {
+            this.largeur = this.hauteurOriginale
+            this.hauteur = this.largeurOriginale
+        } else {
+            this.largeur = this.largeurOriginale
+            this.hauteur = this.hauteurOriginale
+        }
     }
 
     public getEspaceOccupe(): Polygone {
