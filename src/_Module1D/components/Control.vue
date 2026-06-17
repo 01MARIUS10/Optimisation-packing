@@ -25,7 +25,7 @@ const algos: { value: Strategy; label: string; disabled?: boolean }[] = [
   { value: 'first-fit', label: 'First Fit' },
   { value: 'best-fit', label: 'Best Fit' },
   { value: 'worst-fit', label: 'Worst Fit' },
-  { value: 'brute-force', label: 'Brute Force', disabled: true },
+  { value: 'brute-force', label: 'Brute Force' },
 ]
 
 const mode = ref<Mode>('insertionAvecPosition')

@@ -5,6 +5,7 @@ import { useWindow } from './window'
 import { nfdh } from '../algorithme/NFDH'
 import { ffdh } from '../algorithme/FFDH'
 import { bf } from '../algorithme/BF'
+import { bruteForce } from '../algorithme/BruteForce'
 import type { Position, RectangleShape, Strategy } from '../types'
 
 const { windowWidth, windowHeight } = useWindow()
@@ -15,11 +16,12 @@ const error = ref<string | null>(null)
 
 watch([windowWidth, windowHeight], ([w, h]) => conteneur.resize(w, h))
 
-function runStrategy(rects: Rectangle[], strategy: 'nfdh' | 'ffdh' | 'bf'): Conteneur {
+function runStrategy(rects: Rectangle[], strategy: Strategy): Conteneur {
   switch (strategy) {
     case 'nfdh': return nfdh(rects, windowWidth.value, windowHeight.value)
     case 'ffdh': return ffdh(rects, windowWidth.value, windowHeight.value)
     case 'bf': return bf(rects, windowWidth.value, windowHeight.value)
+    case 'brute-force': return bruteForce(rects, windowWidth.value, windowHeight.value)
   }
 }
 
@@ -75,10 +77,6 @@ export function usePlateau() {
   }
 
   function initContainers(shapes: RectangleShape[], strategy: Strategy): boolean {
-    if (strategy === 'brute-force') {
-      error.value = `Algorithme Brute Force : non implémenté`
-      return false
-    }
     const valid = validShapes(shapes)
     clearConteneurAndObjects()
 
@@ -96,10 +94,6 @@ export function usePlateau() {
   }
 
   function reinit(strategy: Strategy): void {
-    if (strategy === 'brute-force') {
-      error.value = `Algorithme Brute Force : non implémenté`
-      return
-    }
     clearConteneurOnly()
     applyResult(runStrategy(objects, strategy))
   }

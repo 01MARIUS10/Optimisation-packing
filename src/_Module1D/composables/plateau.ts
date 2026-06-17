@@ -5,6 +5,8 @@ import { useConteneur } from './conteneur'
 import { firstFit } from '../algotithm/FirstFit'
 import { bestFit } from '../algotithm/BestFit'
 import { worstFit } from '../algotithm/WorstFit'
+import { bruteForce } from '../algotithm/BruteForce'
+
 import type { Position, SegmentShape, Strategy } from '../types'
 
 const { conteneurLength } = useConteneur()
@@ -75,10 +77,6 @@ export function usePlateau() {
   }
 
   function initContainers(shapes: SegmentShape[], strategy: Strategy): boolean {
-    if (strategy === 'brute-force') {
-      error.value = `Algorithme Brute Force : non implémenté`
-      return false
-    }
     const valid = validShapes(shapes)
     clearConteneurAndObjects()
 
@@ -88,14 +86,17 @@ export function usePlateau() {
 
 
     switch (strategy) {
-      case 'first-fit': 
+      case 'first-fit':
         conteneurs.splice(0, conteneurs.length, ...firstFit(objects, conteneurLength.value));
         break
-      case 'best-fit': 
-        conteneurs.splice(0, conteneurs.length, ...bestFit(objects, conteneurLength.value)); 
+      case 'best-fit':
+        conteneurs.splice(0, conteneurs.length, ...bestFit(objects, conteneurLength.value));
         break
-      case 'worst-fit': 
-        conteneurs.splice(0, conteneurs.length, ...worstFit(objects, conteneurLength.value)); 
+      case 'worst-fit':
+        conteneurs.splice(0, conteneurs.length, ...worstFit(objects, conteneurLength.value));
+        break
+      case 'brute-force':
+        conteneurs.splice(0, conteneurs.length, ...bruteForce(objects, conteneurLength.value));
         break
     }
     return valid.length === shapes.length
@@ -111,10 +112,7 @@ export function usePlateau() {
   function reinit(strategy: Strategy): void {
     clearConteneurOnly()
 
-    if (strategy === 'brute-force') {
-      error.value = `Algorithme Brute Force : non implémenté`
-      return
-    }
+    
     switch (strategy) {
       case 'first-fit': 
         conteneurs.splice(0, conteneurs.length, ...firstFit(objects, conteneurLength.value));
@@ -124,6 +122,9 @@ export function usePlateau() {
         break
       case 'worst-fit': 
         conteneurs.splice(0, conteneurs.length, ...worstFit(objects, conteneurLength.value)); 
+        break
+      case 'brute-force':
+        conteneurs.splice(0, conteneurs.length, ...bruteForce(objects, conteneurLength.value));
         break
     }
     error.value = null

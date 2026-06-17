@@ -23,6 +23,7 @@ const reinitAlgos: { value: Strategy; label: string }[] = [
   { value: 'first-fit', label: 'First Fit' },
   { value: 'best-fit', label: 'Best Fit' },
   { value: 'worst-fit', label: 'Worst Fit' },
+  { value: 'brute-force', label: 'Brute Force' },
 ]
 </script>
 

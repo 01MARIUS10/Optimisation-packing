@@ -20,12 +20,13 @@ const reinitAlgos: { value: Strategy; label: string }[] = [
   { value: 'nfdh', label: 'NFDH' },
   { value: 'ffdh', label: 'FFDH' },
   { value: 'bf', label: 'BF' },
+  { value: 'brute-force', label: 'Brute Force' },
 ]
 
 const activeStrategy = ref<Strategy | null>(null)
 
 function handleInitFormes(formes: Form[], strategy: Strategy): void {
-  activeStrategy.value = strategy === 'brute-force' ? null : strategy
+  activeStrategy.value = strategy
   initFormes(formes, strategy)
 }
 

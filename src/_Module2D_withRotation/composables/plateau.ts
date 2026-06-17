@@ -4,6 +4,7 @@ import { useWindow } from './window'
 import { nfdh } from '../algorithme/NFDH'
 import { ffdh } from '../algorithme/FFDH'
 import { bf } from '../algorithme/BF'
+import { bruteForce } from '../algorithme/BruteForce'
 import { Geometrie } from '../algorithme/geometrie'
 import type { Form } from '../models/form'
 import type { Strategy } from '../types'
@@ -16,11 +17,12 @@ const error = ref<string | null>(null)
 
 watch([windowWidth, windowHeight], ([w, h]) => conteneur.resize(w, h))
 
-function runStrategy(formes: Form[], strategy: 'nfdh' | 'ffdh' | 'bf'): Conteneur {
+function runStrategy(formes: Form[], strategy: Strategy): Conteneur {
   switch (strategy) {
     case 'nfdh': return nfdh(formes, windowWidth.value, windowHeight.value)
     case 'ffdh': return ffdh(formes, windowWidth.value, windowHeight.value)
     case 'bf': return bf(formes, windowWidth.value, windowHeight.value)
+    case 'brute-force': return bruteForce(formes, windowWidth.value, windowHeight.value)
   }
 }
 
@@ -51,10 +53,6 @@ function clearConteneurAndObjects(): void {
 
 export function usePlateau() {
   function initFormes(formes: Form[], strategy: Strategy): boolean {
-    if (strategy === 'brute-force') {
-      error.value = `Algorithme Brute Force : non implémenté`
-      return false
-    }
     const valid = validFormes(formes)
     clearConteneurAndObjects()
 
@@ -65,10 +63,6 @@ export function usePlateau() {
   }
 
   function reinit(strategy: Strategy): void {
-    if (strategy === 'brute-force') {
-      error.value = `Algorithme Brute Force : non implémenté`
-      return
-    }
     error.value = null
     applyResult(runStrategy(objects, strategy))
   }

@@ -17,5 +17,5 @@ export const MOCK_FORMS: Form[] = [
 ];
 
 
-export const containerWidth = 640;
-export const containerHeight = 480;
+export const containerWidth = 300;
+export const containerHeight = 400;
