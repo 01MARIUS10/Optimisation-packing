@@ -23,14 +23,14 @@ const emit = defineEmits<{
 }>()
 
 const algos: { value: Strategy; label: string; disabled?: boolean }[] = [
-  { value: 'first-fit', label: 'First Fit' },
-  { value: 'best-fit', label: 'Best Fit' },
-  { value: 'worst-fit', label: 'Worst Fit' },
+  { value: 'nfdh', label: 'NFDH' },
+  { value: 'ffdh', label: 'FFDH' },
+  { value: 'bf', label: 'BF' },
   { value: 'brute-force', label: 'Brute Force', disabled: true },
 ]
 
 const mode = ref<Mode>('insertionAvecPosition')
-const algo = ref<Strategy>('first-fit')
+const algo = ref<Strategy>('nfdh')
 const insertion = reactive({ position: { x: 0, y: 0 } as Position, shape: { w: 100, h: 80 } as RectangleShape })
 const simple = reactive<RectangleShape>({ w: 100, h: 80 })
 const multipleShape = reactive<RectangleShape>({ w: 100, h: 80 })

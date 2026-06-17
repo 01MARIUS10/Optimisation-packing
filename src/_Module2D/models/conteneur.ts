@@ -102,6 +102,14 @@ export class Conteneur {
     return true
   }
 
+  /** Place un rectangle dont la position est exprimée depuis le coin bas-gauche
+   *  du conteneur (y croît vers le haut), et la convertit en coordonnées internes
+   *  (y croît vers le bas, comme le reste du modèle/canvas). */
+  placeFromBottomLeft(pos: Position, rect: Rectangle): boolean {
+    const y = this.height - pos.y - rect.shape.h
+    return this.placeExisting({ x: pos.x, y }, rect)
+  }
+
   remove(id: string): void {
     const idx = this.rects.findIndex(r => r.id === id)
     if (idx === -1) return

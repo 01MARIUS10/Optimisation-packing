@@ -8,7 +8,7 @@ export interface Position {
   y: number
 }
 
-export type Strategy = 'first-fit' | 'best-fit' | 'worst-fit' | 'brute-force'
+export type Strategy = 'nfdh' | 'ffdh' | 'bf' | 'brute-force'
 
 export interface RectangleLike {
   id: string

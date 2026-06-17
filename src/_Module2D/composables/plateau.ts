@@ -2,32 +2,32 @@ import { ref, reactive, watch } from 'vue'
 import { Conteneur } from '../models/conteneur'
 import { Rectangle } from '../models/rectangle'
 import { useWindow } from './window'
-import { firstFit } from '../algorithme/FirstFit'
-import { bestFit } from '../algorithme/BestFit'
-import { worstFit } from '../algorithme/WorstFit'
+import { nfdh } from '../algorithme/NFDH'
+import { ffdh } from '../algorithme/FFDH'
+import { bf } from '../algorithme/BF'
 import type { Position, RectangleShape, Strategy } from '../types'
 
 const { windowWidth, windowHeight } = useWindow()
 
 const objects = reactive<Rectangle[]>([])
-const conteneurs = reactive<Conteneur[]>([new Conteneur(windowWidth.value, windowHeight.value)]) as unknown as Conteneur[]
+const conteneur = reactive(new Conteneur(windowWidth.value, windowHeight.value)) as unknown as Conteneur
 const error = ref<string | null>(null)
 
-watch([windowWidth, windowHeight], ([w, h]) => conteneurs.forEach(conteneur => conteneur.resize(w, h)))
+watch([windowWidth, windowHeight], ([w, h]) => conteneur.resize(w, h))
 
-//placer dynamiquement
-function placeOne(rect: Rectangle): void {
-  for (const conteneur of conteneurs) {
-    const freeSpace = conteneur.getFreeSpace()
-    if (freeSpace !== null && freeSpace.canFit(rect)) {
-      conteneur.addRectangle(rect)
-      return
-    }
+function runStrategy(rects: Rectangle[], strategy: 'nfdh' | 'ffdh' | 'bf'): Conteneur {
+  switch (strategy) {
+    case 'nfdh': return nfdh(rects, windowWidth.value, windowHeight.value)
+    case 'ffdh': return ffdh(rects, windowWidth.value, windowHeight.value)
+    case 'bf': return bf(rects, windowWidth.value, windowHeight.value)
   }
-  if (rect.shape.w > windowWidth.value || rect.shape.h > windowHeight.value) return
-  const conteneur = new Conteneur(windowWidth.value, windowHeight.value)
-  conteneurs.push(conteneur)
-  conteneur.addRectangle(rect)
+}
+
+function applyResult(result: Conteneur): void {
+  conteneur.reset()
+  for (const r of result.rects) conteneur.placeExisting(r.position, r)
+  const unplaced = objects.length - conteneur.rects.length
+  error.value = unplaced > 0 ? `${unplaced} rectangle(s) n'ont pas pu être placés` : null
 }
 
 function clearConteneurAndObjects(): void {
@@ -36,7 +36,7 @@ function clearConteneurAndObjects(): void {
 }
 function clearConteneurOnly(): void {
   error.value = null
-  conteneurs.splice(0, conteneurs.length, new Conteneur(windowWidth.value, windowHeight.value))
+  conteneur.reset()
 }
 
 export function usePlateau() {
@@ -44,7 +44,7 @@ export function usePlateau() {
   function addRectangleToCurrentAt(config: { position: Position; shape: RectangleShape }): boolean {
     error.value = null
     const rect = new Rectangle(config.position, config.shape)
-    if (!conteneurs[0]!.placeExisting(config.position, rect)) {
+    if (!conteneur.placeExisting(config.position, rect)) {
       error.value = `Zone déjà occupée ou hors limites (x:${config.position.x}, y:${config.position.y}, ${config.shape.w}×${config.shape.h})`
       return false
     }
@@ -55,13 +55,13 @@ export function usePlateau() {
   //placer dynamiquement
   function addRectangleToCurrent(shape: RectangleShape): boolean {
     error.value = null
-    if (shape.w > windowWidth.value || shape.h > windowHeight.value) {
+    const rect = new Rectangle({ x: 0, y: 0 }, shape)
+    const freeSpace = conteneur.getFreeSpace()
+    if (freeSpace === null || !freeSpace.canFit(rect) || !conteneur.addRectangle(rect)) {
       error.value = `Aucune position disponible pour ${shape.w}×${shape.h}`
       return false
     }
-    const rect = new Rectangle({ x: 0, y: 0 }, shape)
     objects.push(rect)
-    placeOne(rect)
     return true
   }
 
@@ -82,54 +82,31 @@ export function usePlateau() {
     const valid = validShapes(shapes)
     clearConteneurAndObjects()
 
-    for (const shape of valid) {
-      objects.push(new Rectangle({ x: 0, y: 0 }, shape))
-    }
+    const rects = valid.map(shape => new Rectangle({ x: 0, y: 0 }, shape))
+    objects.push(...rects)
 
-    switch (strategy) {
-      case 'first-fit':
-        conteneurs.splice(0, conteneurs.length, ...firstFit(objects, windowWidth.value, windowHeight.value))
-        break
-      case 'best-fit':
-        conteneurs.splice(0, conteneurs.length, ...bestFit(objects, windowWidth.value, windowHeight.value))
-        break
-      case 'worst-fit':
-        conteneurs.splice(0, conteneurs.length, ...worstFit(objects, windowWidth.value, windowHeight.value))
-        break
-    }
-    return valid.length === shapes.length
+    applyResult(runStrategy(rects, strategy))
+    return conteneur.rects.length === shapes.length
   }
 
   function removeRectangle(id: string): void {
     const idx = objects.findIndex(o => o.id === id)
     if (idx !== -1) objects.splice(idx, 1)
-    for (const conteneur of conteneurs) conteneur.remove(id)
+    conteneur.remove(id)
   }
 
   function reinit(strategy: Strategy): void {
-    clearConteneurOnly()
-
     if (strategy === 'brute-force') {
       error.value = `Algorithme Brute Force : non implémenté`
       return
     }
-    switch (strategy) {
-      case 'first-fit':
-        conteneurs.splice(0, conteneurs.length, ...firstFit(objects, windowWidth.value, windowHeight.value))
-        break
-      case 'best-fit':
-        conteneurs.splice(0, conteneurs.length, ...bestFit(objects, windowWidth.value, windowHeight.value))
-        break
-      case 'worst-fit':
-        conteneurs.splice(0, conteneurs.length, ...worstFit(objects, windowWidth.value, windowHeight.value))
-        break
-    }
-    error.value = null
+    clearConteneurOnly()
+    applyResult(runStrategy(objects, strategy))
   }
 
   return {
     objects,
-    conteneurs,
+    conteneur,
     error,
     addRectangleToCurrentAt,
     addRectangleToCurrent,

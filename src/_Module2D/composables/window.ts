@@ -1,7 +1,7 @@
 import { ref } from 'vue'
-
-const windowWidth = ref(800)
-const windowHeight = ref(600)
+import { containerWidth, containerHeight } from '../mock/data'
+const windowWidth = ref(containerWidth)
+const windowHeight = ref(containerHeight)
 
 export function useWindow() {
   return { windowWidth, windowHeight }

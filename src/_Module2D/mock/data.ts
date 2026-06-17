@@ -1,19 +1,21 @@
 export const rectangles = [
-    { w: 70, h: 20 },
-    { w: 10, h: 20 },
 
-    { w: 60, h: 15 },
-    { w: 20, h: 15 },
+  { w: 640, h: 160 }, 
 
-    { w: 50, h: 10 },
-    { w: 30, h: 10 },
 
-    { w: 40, h: 25 },
-    { w: 20, h: 25 },
+  { w: 280, h: 120 }, 
 
-    { w: 15, h: 15 },
-    { w: 15, h: 15 },
+  { w: 400, h: 80 },  
+
+  { w: 240, h: 40 },  
+
+  { w: 360, h: 40 },  
+
+  { w: 200, h: 40 },  
+  { w: 180, h: 40 },  
+  { w: 160, h: 40 },  
+  { w: 140, h: 40 },  
 ]
 
-export const containerWidth = 80
-export const containerHeight = 60
+export const containerWidth = 640
+export const containerHeight = 480

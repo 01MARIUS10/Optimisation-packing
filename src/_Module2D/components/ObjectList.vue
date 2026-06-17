@@ -2,12 +2,12 @@
 import type { Rectangle as RectangleModel } from '../models/rectangle'
 import Rectangle from './Rectangle.vue'
 
-defineProps<{ objectList: RectangleModel[] }>()
+defineProps<{ titre: string; objectList: RectangleModel[] }>()
 </script>
 
 <template>
   <div class="bg-white rounded-xl shadow p-4">
-    <h2 class="font-semibold text-gray-700 mb-2">Objets</h2>
+    <h2 class="font-semibold text-gray-700 mb-2">{{ titre }}</h2>
     <div v-if="objectList.length" class="flex flex-wrap gap-3">
       <div
         v-for="obj in objectList"
