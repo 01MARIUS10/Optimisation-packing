@@ -1,7 +1,7 @@
-import type { Position, RectangleShape } from '../types'
+import type { Position } from '../types'
 import { Rectangle } from './rectangle'
 
-export class Matrice {
+export class Conteneur {
   private cells: number[][]
   readonly rects: Rectangle[] = []
   width: number
@@ -35,19 +35,70 @@ export class Matrice {
     }
   }
 
-  findPosition(shape: RectangleShape): Position | null {
-    for (let y = 0; y <= this.height - shape.h; y++) {
-      for (let x = 0; x <= this.width - shape.w; x++) {
-        if (!this.isOccupied(x, y, shape.w, shape.h)) return { x, y }
+  getFreeSpace(): Rectangle | null {
+    let bestX = -1
+    let bestY = -1
+    let bestW = 0
+    let bestH = 0
+    let bestArea = 0
+
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        if (this.cells[y]![x] !== 0) continue
+
+        let w = 0
+        while (x + w < this.width && this.cells[y]![x + w] === 0) w++
+
+        let h = 1
+        outer: while (y + h < this.height) {
+          for (let col = x; col < x + w; col++) {
+            if (this.cells[y + h]![col] !== 0) break outer
+          }
+          h++
+        }
+
+        const area = w * h
+        if (area > bestArea) {
+          bestArea = area
+          bestX = x
+          bestY = y
+          bestW = w
+          bestH = h
+        }
       }
     }
-    return null
+
+    if (bestArea === 0) return null
+
+    return new Rectangle(
+      { x: bestX, y: bestY },
+      { w: bestW, h: bestH }
+    )
   }
 
-  canPlaceInto(pos: Position, shape: RectangleShape): boolean {
-    if (this.isOccupied(pos.x, pos.y, shape.w, shape.h)) return false
-    this.mark(pos.x, pos.y, shape.w, shape.h)
-    this.rects.push(new Rectangle(pos, shape))
+  /** Tente de placer un rectangle à la première position libre suffisante.
+   *  Retourne true si le placement a réussi, false sinon. */
+  addRectangle(rect: Rectangle): boolean {
+    const { w, h } = rect.shape
+
+    for (let y = 0; y <= this.height - h; y++) {
+      for (let x = 0; x <= this.width - w; x++) {
+        if (!this.isOccupied(x, y, w, h)) {
+          this.mark(x, y, w, h)
+          rect.position = { x, y }
+          this.rects.push(rect)
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  placeExisting(pos: Position, rect: Rectangle): boolean {
+    if (this.isOccupied(pos.x, pos.y, rect.shape.w, rect.shape.h)) return false
+    this.mark(pos.x, pos.y, rect.shape.w, rect.shape.h)
+    rect.position = pos
+    this.rects.push(rect)
     return true
   }
 
@@ -66,7 +117,7 @@ export class Matrice {
     this.cells = this.build(w, h)
     this.rects.length = 0
     for (const r of saved) {
-      this.canPlaceInto(r.position, r.shape)
+      this.placeExisting(r.position, r)
     }
   }
 

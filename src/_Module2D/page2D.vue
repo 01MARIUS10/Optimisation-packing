@@ -3,31 +3,58 @@ import { watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useWindow } from './composables/window'
 import { usePlateau } from './composables/plateau'
+import type { Strategy } from './types'
 import Control from './components/Control.vue'
+import ObjectList from './components/ObjectList.vue'
 import Window from './components/Window.vue'
 
 const { windowWidth, windowHeight } = useWindow()
-const { matrice, error, addRectangle, addRectangleAuto, clearRectangles } = usePlateau()
+const {
+  objects, conteneurs, error,
+  addRectangleToCurrentAt, addRectangleToCurrent, initContainers,
+  clearConteneurAndObjects, reinit,
+} = usePlateau()
 
 watch(error, val => {
   if (val) setTimeout(() => (error.value = null), 4000)
 })
+
+const reinitAlgos: { value: Strategy; label: string }[] = [
+  { value: 'first-fit', label: 'First Fit' },
+  { value: 'best-fit', label: 'Best Fit' },
+  { value: 'worst-fit', label: 'Worst Fit' },
+]
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-100 p-6 flex flex-col gap-6">
     <div class="flex items-center gap-4">
       <RouterLink to="/" class="text-sm text-gray-500 hover:text-gray-700">← Accueil</RouterLink>
-      <h1 class="text-2xl font-bold text-gray-800">2D Packing</h1>
+      <h1 class="text-2xl font-bold text-gray-800">Module 2D</h1>
     </div>
 
     <Control
       v-model:windowWidth="windowWidth"
       v-model:windowHeight="windowHeight"
-      @newRectangle="addRectangle"
-      @newRectangleAuto="addRectangleAuto"
-      @clearRectangles="clearRectangles"
+      @newRectangleAt="addRectangleToCurrentAt"
+      @newRectangle="addRectangleToCurrent"
+      @initContainers="initContainers"
+      @clearConteneurAndObjects="clearConteneurAndObjects"
     />
+
+    <ObjectList :objectList="objects" />
+
+    <div class="flex items-center gap-2 text-sm">
+      <span class="font-medium text-gray-600">Réorganiser avec :</span>
+      <button
+        v-for="a in reinitAlgos"
+        :key="a.value"
+        @click="reinit(a.value)"
+        class="bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700"
+      >
+        {{ a.label }}
+      </button>
+    </div>
 
     <transition name="fade">
       <div
@@ -38,10 +65,12 @@ watch(error, val => {
       </div>
     </transition>
 
-    <div class="text-sm text-gray-500">{{ matrice.rects.length }} rectangle(s)</div>
+    <div class="text-sm text-gray-500">
+      {{ conteneurs.reduce((sum, c) => sum + c.rects.length, 0) }} rectangle(s) — {{ conteneurs.length }} fenêtre(s)
+    </div>
 
-    <div class="overflow-auto">
-      <Window v-model="matrice" />
+    <div v-for="(conteneur, i) in conteneurs" :key="i" class="overflow-auto">
+      <Window :model-value="conteneur" :index="i" />
     </div>
   </div>
 </template>

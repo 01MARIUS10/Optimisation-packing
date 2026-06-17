@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Rectangle } from '../models/rectangle'
+import type { RectangleLike } from '../types'
 
-defineProps<{ config: Rectangle }>()
+defineProps<{ config: RectangleLike }>()
 </script>
 
 <template>

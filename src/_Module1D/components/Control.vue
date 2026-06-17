@@ -36,7 +36,6 @@ const multipleShape = reactive<SegmentShape>({ w: 100 })
 const multipleQueue = reactive<SegmentShape[]>([])
 
 function applyMultiple() {
-  console.log('Applying multiple insertion with strategy:',multipleQueue.map(s => ({ ...s })), algo.value)
   emit('initContainers', multipleQueue.map(s => ({ ...s })), algo.value)
   multipleQueue.splice(0, multipleQueue.length)
 }

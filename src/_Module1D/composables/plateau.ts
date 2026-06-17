@@ -75,7 +75,6 @@ export function usePlateau() {
   }
 
   function initContainers(shapes: SegmentShape[], strategy: Strategy): boolean {
-    console.log('useplateau','Initializing containers with strategy:', strategy, objects);
     if (strategy === 'brute-force') {
       error.value = `Algorithme Brute Force : non implémenté`
       return false
@@ -90,7 +89,6 @@ export function usePlateau() {
 
     switch (strategy) {
       case 'first-fit': 
-        console.log('first-fit', conteneurs);
         conteneurs.splice(0, conteneurs.length, ...firstFit(objects, conteneurLength.value));
         break
       case 'best-fit': 
@@ -111,7 +109,6 @@ export function usePlateau() {
 
 
   function reinit(strategy: Strategy): void {
-    console.log('reinit', strategy, objects);
     clearConteneurOnly()
 
     if (strategy === 'brute-force') {
