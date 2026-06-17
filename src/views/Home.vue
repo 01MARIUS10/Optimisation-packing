@@ -25,6 +25,15 @@
         <span class="text-lg font-semibold text-gray-800 group-hover:text-emerald-600 transition-colors">Module 2D</span>
         <span class="text-sm text-gray-400">Placement rectangulaire</span>
       </RouterLink>
+
+      <RouterLink
+        to="/module2d-rotation"
+        class="group flex flex-col gap-3 bg-white rounded-2xl shadow-sm border border-gray-200 p-8 w-52 text-center hover:shadow-md hover:border-purple-300 transition-all"
+      >
+        <span class="text-5xl">🔺</span>
+        <span class="text-lg font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">Module 2D+</span>
+        <span class="text-sm text-gray-400">Formes mixtes</span>
+      </RouterLink>
     </div>
   </div>
 </template>

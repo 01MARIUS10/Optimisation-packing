@@ -3,25 +3,18 @@ import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useWindow } from './composables/window'
 import { usePlateau } from './composables/plateau'
-import type { RectangleShape, Strategy } from './types'
+import type { Strategy } from './types'
+import type { Form } from './models/form'
 import Control from './components/Control.vue'
 import ObjectList from './components/ObjectList.vue'
 import Window from './components/Window.vue'
 
 const { windowWidth, windowHeight } = useWindow()
-const {
-  objects, conteneur, error,
-  addRectangleToCurrentAt, addRectangleToCurrent, initContainers,
-  clearConteneurAndObjects, reinit,
-} = usePlateau()
+const { objects, conteneur, error, initFormes, reinit, clearConteneurAndObjects } = usePlateau()
 
 watch(error, val => {
   if (val) setTimeout(() => (error.value = null), 4000)
 })
-
-const placedIds = computed(() => new Set(conteneur.rects.map(r => r.id)))
-const placedObjects = computed(() => objects.filter(o => placedIds.value.has(o.id)))
-const unplacedObjects = computed(() => objects.filter(o => !placedIds.value.has(o.id)))
 
 const reinitAlgos: { value: Strategy; label: string }[] = [
   { value: 'nfdh', label: 'NFDH' },
@@ -31,9 +24,9 @@ const reinitAlgos: { value: Strategy; label: string }[] = [
 
 const activeStrategy = ref<Strategy | null>(null)
 
-function handleInitContainers(shapes: RectangleShape[], strategy: Strategy): void {
+function handleInitFormes(formes: Form[], strategy: Strategy): void {
   activeStrategy.value = strategy === 'brute-force' ? null : strategy
-  initContainers(shapes, strategy)
+  initFormes(formes, strategy)
 }
 
 function handleReinit(strategy: Strategy): void {
@@ -41,33 +34,27 @@ function handleReinit(strategy: Strategy): void {
   reinit(strategy)
 }
 
-function handleClear(): void {
-  activeStrategy.value = null
-  clearConteneurAndObjects()
-}
-
 const resetKey = computed(() => {
-  return conteneur.rects.map(r => {
-    return [r.id.slice(0, 3), r.position.x, r.position.y].join('-')
-  }).join(';')
+  return conteneur.formes.map(f => [f.id.slice(0, 3), f.position.x, f.position.y].join('-')).join(';')
 })
 
+const placedIds = computed(() => new Set(conteneur.formes.map(f => f.id)))
+const placedObjects = computed(() => objects.filter(o => placedIds.value.has(o.id)))
+const unplacedObjects = computed(() => objects.filter(o => !placedIds.value.has(o.id)))
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-100 p-6 flex flex-col gap-6">
     <div class="flex items-center gap-4">
       <RouterLink to="/" class="text-sm text-gray-500 hover:text-gray-700">← Accueil</RouterLink>
-      <h1 class="text-2xl font-bold text-gray-800">Module 2D</h1>
+      <h1 class="text-2xl font-bold text-gray-800">Module 2D (avec rotation)</h1>
     </div>
 
     <Control
       v-model:windowWidth="windowWidth"
       v-model:windowHeight="windowHeight"
-      @newRectangleAt="addRectangleToCurrentAt"
-      @newRectangle="addRectangleToCurrent"
-      @initContainers="handleInitContainers"
-      @clearConteneurAndObjects="handleClear"
+      @initFormes="handleInitFormes"
+      @clearConteneurAndObjects="clearConteneurAndObjects"
     />
 
     <div class="flex items-center gap-2 text-sm">
@@ -104,7 +91,7 @@ const resetKey = computed(() => {
     </transition>
 
     <div class="text-sm text-gray-500">
-      {{ conteneur.rects.length }} / {{ objects.length }} rectangle(s) placé(s)
+      {{ conteneur.formes.length }} / {{ objects.length }} forme(s) placée(s)
     </div>
 
     <div class="overflow-auto">
